@@ -10,20 +10,51 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+https://github.com/kamaulindhardt/V4F_agrivoltaics
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+# Preparing R script
 
-```{r cars}
-summary(cars)
+Packages to be installed first
+
+```{r Installing the pacman package, warning=FALSE}
+install.packages("pacman")
+#install.packages("tidyverse")
 ```
 
-## Including Plots
+## Installing at loading packages and libraries needed
 
-You can also embed plots, for example:
+```{r Loading other needed packages, warning=FALSE}
+suppressWarnings({
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+  # Applying the p_load function to load multiple add-on packages in one line of code.
+
+  pacman::p_load(
+    tidyverse,  # general package for everything
+    readxl,     # reading excel data
+    vroom,      # for crazy fast method of loading/reading datasets from local disc
+    janitor,    # for cleaning data column names
+    styler     # for neatly organising code
+  )
+})
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+tdr_data <- read_excel("DATA/TDR.xlsx", 
+                       sheet = "Sheet1")
+
+tdr_data
+```
+
+```{r}
+# Filter the data for the specific depths of 0.2 and 0.5 meters
+filtered_data <- tdr_data %>%
+  filter(`TDR Probe Rod Depth [m]` %in% c(0.2, 0.5))
+
+# Create the boxplot
+ggplot(filtered_data, aes(x = factor(`TDR Probe Rod Depth [m]`), y = `TDR Soil Water Measurement [%]`)) +
+  geom_boxplot() +
+  labs(x = "TDR Probe Rod Depth [m]", y = "Soil Water Measurement [%]") +
+  ggtitle("TDR Soil Water Measurement by Probe Rod Depth") +
+  theme_bw()
+```
+
